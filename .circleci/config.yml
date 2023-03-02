@@ -65,7 +65,9 @@ workflows:
           requires:
             - checkoutAndTest
 
-      - waitForStagingToBeUp
+      - waitForStagingToBeUp:
+          requires:
+            - deployStaging
 
       - acceptancesl:
           requires:
