@@ -57,9 +57,13 @@ workflows:
     jobs:
       - notifyTeamOfNewBuild
 
-      - checkoutAndTest
+      - checkoutAndTest:
+          requires:
+            - notifyTeamOfNewBuild
 
-      - deployStaging
+      - deployStaging:
+          requires:
+            - checkoutAndTest
 
       - waitForStagingToBeUp
 
@@ -71,6 +75,12 @@ workflows:
           requires:
             - waitForStagingToBeUp
 
-      - deployProd
+      - deployProd:
+          requires:
+            - acceptancesl
 
-      - notifyNewVersion
+            - acceptances2
+
+      - notifyNewVersion:
+          requires:
+            - deployProd
