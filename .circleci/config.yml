@@ -1,88 +1,87 @@
 version: 2.1
 
 jobs:
-  waitForStagingToBeUp:
+  checkout_and_unit_test:
     machine: true
-
     steps:
-      - run: echo "Waiting until response from staging..."
+      - run: echo "Checkout and unit test."
 
-  deployProd:
+  deploy_backend:
     machine: true
-
     steps:
-      - run: echo "deploy production build"
+      - run: echo "Deploy backend."
 
-  notifyTeamOfNewBuild:
+  integration_test_backend:
     machine: true
-
     steps:
-      - run: echo "notifying team of new build pipeline"
+      - run: echo "Integration test backend."
 
-  acceptancesl:
+  deploy_staging:
     machine: true
-
     steps:
-      - run: echo "acceptance tests 1-5"
+      - run: echo "Deploy staging."
 
-  checkoutAndTest:
-    docker:
-      - image: cimg/node:15.8.0
-
-    steps:
-      - checkout
-
-      - run: echo "unit tests"
-
-  acceptances2:
+  acceptance_tests_1:
     machine: true
-
     steps:
-      - run: echo "acceptance tests 6-10"
+      - run: echo "Acceptance test 1."
 
-  deployStaging:
+  acceptance_tests_2:
     machine: true
-
     steps:
-      - run: echo "deploy staging"
+      - run: echo "Acceptance test 2."
 
-  notifyNewVersion:
+  acceptance_tests_3:
     machine: true
-
     steps:
-      - run: echo "notifying client of new version"
+      - run: echo "Acceptance test 3."
+
+  acceptance_tests_4:
+    machine: true
+    steps:
+      - run: echo "Acceptance test 4."
+
+  deploy_production:
+    machine: true
+    steps:
+      - run: echo "Deploy production."
 
 workflows:
   monWorkflow:
     jobs:
-      - notifyTeamOfNewBuild
+      - checkout_and_unit_test
 
-      - checkoutAndTest:
+      - deploy_backend:
           requires:
-            - notifyTeamOfNewBuild
+            - checkout_and_unit_test
 
-      - deployStaging:
+      - integration_test_backend:
           requires:
-            - checkoutAndTest
+            - deploy_backend
 
-      - waitForStagingToBeUp:
+      - deploy_staging:
           requires:
-            - deployStaging
+            - integration_test_backend
 
-      - acceptancesl:
+      - acceptance_tests_1:
           requires:
-            - waitForStagingToBeUp
+            - deploy_staging
 
-      - acceptances2:
+      - acceptance_tests_2:
           requires:
-            - waitForStagingToBeUp
+            - deploy_staging
 
-      - deployProd:
+      - acceptance_tests_3:
           requires:
-            - acceptancesl
+            - deploy_staging
 
-            - acceptances2
-
-      - notifyNewVersion:
+      - acceptance_tests_4:
           requires:
-            - deployProd
+            - deploy_staging
+
+      - deploy_production:
+          requires:
+            - acceptance_tests_1
+            - acceptance_tests_2
+            - acceptance_tests_3
+            - acceptance_tests_4
